@@ -19,7 +19,9 @@ class PixelData
 
     getOffset(x,y)
     { 
-        return this.offset + this.rowSize*(this.height - y - 1) + 3*x;
+        let X = Math.round(x);
+        let Y = Math.round(y);
+        return this.offset + this.rowSize*(this.height - Y - 1) + 3*X;
     }
 
     flipHorizontally()
@@ -56,6 +58,47 @@ class PixelData
         this.fillRect(left + width, top, lineWidth, H, R, G, B);
         this.fillRect(left, top + height, W, lineWidth, R, G, B);
         this.fillRect(left, top, lineWidth, H, R, G, B);
+    }
+
+    strokeLine(x1,y1,x2,y2,R=0,G=0,B=0,lineWidth=1)
+    {
+        if(x1 == x2)
+        {
+            this.fillRect(x1,y1,lineWidth,Math.abs(y2-y1));
+            return;
+        }
+
+        let a = (y2 - y1) / (x2 - x1);
+        let b = y1 - a*x1;
+
+        if(lineWidth == 1)
+        {
+            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x++)
+            {
+                let y = Math.round(a*x + b);
+                let offset = this.getOffset(x,y);
+                this.buffer.writeUint8(B,offset);
+                this.buffer.writeUint8(G,offset+1);
+                this.buffer.writeUint8(R,offset+2);
+            }
+        }
+        else
+        {
+            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x++)
+            {
+                let y = a*x + b;
+                for(let t=-lineWidth/2; t<=lineWidth/2; t += 0.01)
+                {
+                    let offset_x = t * (-a) / Math.sqrt(a*a + 1);
+                    let offset_y = t / Math.sqrt(a*a + 1);
+                    let offset = this.getOffset(x + offset_x, y + offset_y);
+                    this.buffer.writeUint8(B,offset);
+                    this.buffer.writeUint8(G,offset+1);
+                    this.buffer.writeUint8(R,offset+2);
+                }
+            }
+            
+        }
     }
 
     fillRect(x,y,width,height,R=0,G=0,B=0)
