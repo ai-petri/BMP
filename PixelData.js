@@ -128,17 +128,28 @@ class PixelData
     }
 
     fillArc(x,y,radius,startAngle,endAngle,R=0,G=0,B=0)
-    {
-        for(let r=0; r<=radius; r += 0.1)
+    {    
+        for(let X=x-radius; X<=x+radius; X++)
         {
-            for(let angle=startAngle; angle<=endAngle; angle += 0.01)
+            for(let Y=y-radius; Y<=y+radius; Y++)
             {
-                let offset_x = r*Math.cos(angle);
-                let offset_y = r*Math.sin(angle);
-                this.setPixel(x + offset_x, y + offset_y, R, G, B);
+                if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
+                {
+                    let angle = Math.atan2(Y-y, X-x);
+                    if(angle < 0)
+                    {
+                        angle += 2*Math.PI;
+                    }
+                    
+                    if(angle > startAngle && angle < endAngle)
+                    {
+                        this.setPixel(X,Y,R,G,B);
+                    }
+                }
             }
         }
     }
+
     fillRect(x,y,width,height,R=0,G=0,B=0)
     {
         for(let X=x; X<x+width; X++)
