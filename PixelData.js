@@ -35,6 +35,17 @@ class PixelData
         }
     }
 
+    flipVertically()
+    {
+        let clone = Buffer.from(this.buffer);
+        for(let i=0; i<this.height; i++)
+        {
+            let rowOffset1 = this.offset + i*this.rowSize;
+            let rowOffset2 = this.offset + (this.height - i)*this.rowSize;
+            clone.copy(this.buffer, rowOffset1, rowOffset2);
+        }
+    }
+
     strokeRect(x,y,width,height,R=0,G=0,B=0,lineWidth=1)
     {
         let top = Math.round(y-lineWidth/2);
