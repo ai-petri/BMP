@@ -12,10 +12,27 @@ class PixelData
         this.height = options.height;
     }
 
-    getOffset(x,y)
+    get rowSize()
     {
-        let rowSize = Math.ceil(this.width*3/4)*4;
-        return this.offset + rowSize*(this.height - y - 1) + 3*x;
+        return Math.ceil(this.width*3/4)*4;
+    }
+
+    getOffset(x,y)
+    { 
+        return this.offset + this.rowSize*(this.height - y - 1) + 3*x;
+    }
+
+    flipHorizontally()
+    {
+        for(let i=0; i<this.height; i++)
+        {
+            let rowOffset = this.offset + i*this.rowSize;
+            let row = Buffer.from(this.buffer.subarray(rowOffset, rowOffset + 3*this.width));
+            for(let x=0; x<this.width; x++)
+            {
+                row.copy(this.buffer, rowOffset + 3*x, row.length - 3*(x+1), row.length - 3*x);
+            }
+        }
     }
 
     strokeRect(x,y,width,height,R=0,G=0,B=0,lineWidth=1)
