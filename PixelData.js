@@ -100,6 +100,22 @@ class PixelData
             
         }
     }
+    /**
+     * @param {Array<{x:Number,y:Number}>} points 
+     * @param {Number} R 
+     * @param {Number} G 
+     * @param {Number} B 
+     * @param {Number} lineWidth 
+     */
+    strokePath(points,R=0,G=0,B=0,lineWidth=1)
+    {
+        if(points.length < 2) return;
+
+        for(let i=0; i<points.length - 1; i++)
+        {
+            this.strokeLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, R, G, B, lineWidth);
+        }
+    }
 
     fillRect(x,y,width,height,R=0,G=0,B=0)
     {
