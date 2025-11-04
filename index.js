@@ -1,5 +1,6 @@
 const fs = require("fs");
-const BitmapInfoHeader = require("./BitmapInfoHeader")
+const BitmapInfoHeader = require("./BitmapInfoHeader");
+const PixelData = require("./PixelData");
 
 let buffer = fs.readFileSync("image.bmp");
 
@@ -19,28 +20,9 @@ offset += 4;
 //BITMAPINFOHEADER
 let header = new BitmapInfoHeader(buffer);
 
+let pixelData = new PixelData(buffer,{offset:pixelDataOffset,width:header.width,height:header.height})
 
 
-function getOffset(x,y)
-{
-    let rowSize = Math.ceil(header.width*3/4)*4;
-    return pixelDataOffset + rowSize*(header.height - y - 1) + 3*x
-}
-
-function rect(x,y,width,height,R=0,G=0,B=0)
-{
-    for(let X=x; X<x+width; X++)
-    {
-        for(let Y=y; Y<y+height; Y++)
-        {
-            let i = getOffset(X,Y);
-            buffer.writeUint8(B,i);
-            buffer.writeUint8(G,i+1);
-            buffer.writeUint8(R,i+2);
-        }
-    }
-}
-
-rect(0,0,800,600,0,0,255);
+pixelData.fillRect(0,0,200,200,0,125,0);
 
 fs.writeFileSync("image.bmp",buffer)
