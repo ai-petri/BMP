@@ -1,4 +1,5 @@
 const fs = require("fs");
+const BitmapInfoHeader = require("./BitmapInfoHeader")
 
 let buffer = fs.readFileSync("image.bmp");
 
@@ -16,30 +17,7 @@ let pixelDataOffset = buffer.readUint32LE(offset);
 offset += 4;
 
 //BITMAPINFOHEADER
-let header = {}
-header.headerSize = buffer.readUInt32LE(offset);
-offset += 4;
-header.width = buffer.readUInt32LE(offset);
-offset += 4;
-header.height = buffer.readUInt32LE(offset);
-offset += 4;
-header.numberOfColorPlanes = buffer.readUint16LE(offset);
-offset += 2;
-header.bitsPerPixel = buffer.readUint16LE(offset);
-offset += 2;
-header.compression = buffer.readUint32LE(offset);
-offset += 4;
-header.sizeOfBitmapData = buffer.readUint32LE(offset);
-offset += 4;
-header.horizontalResolution = buffer.readUint32LE(offset);//pixels per meter
-offset += 4;
-header.verticalResolution = buffer.readUint32LE(offset);//pixels per meter
-offset += 4;
-header.numberOfColorsInPalette = buffer.readUint32LE(offset);
-offset += 4;
-header.numberOfImportantColors = buffer.readUint32LE(offset);
-offset += 4;
-console.log(header)
+let header = new BitmapInfoHeader(buffer);
 
 
 
