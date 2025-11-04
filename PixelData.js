@@ -113,10 +113,30 @@ class PixelData
 
         for(let i=0; i<points.length - 1; i++)
         {
+            if(lineWidth > 1 && i > 0)
+            {
+                this.fillArc(points[i].x, points[i].y, lineWidth/2, 0, 2*Math.PI, R, G, B);
+            }
             this.strokeLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, R, G, B, lineWidth);
         }
     }
 
+    fillArc(x,y,radius,startAngle,endAngle,R=0,G=0,B=0)
+    {
+        for(let r=0; r<=radius; r += 0.1)
+        {
+            for(let angle=startAngle; angle<=endAngle; angle += 0.01)
+            {
+                let offset_x = r*Math.cos(angle);
+                let offset_y = r*Math.sin(angle);
+                let i = this.getOffset(x + offset_x, y + offset_y);
+                this.buffer.writeUint8(B,i);
+                this.buffer.writeUint8(G,i+1);
+                this.buffer.writeUint8(R,i+2);
+                
+            }
+        }
+    }
     fillRect(x,y,width,height,R=0,G=0,B=0)
     {
         for(let X=x; X<x+width; X++)
