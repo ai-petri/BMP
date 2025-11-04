@@ -84,10 +84,10 @@ class PixelData
         }
         else
         {
-            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x++)
+            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x += 0.1)
             {
                 let y = a*x + b;
-                for(let t=-lineWidth/2; t<=lineWidth/2; t += 0.01)
+                for(let t=-lineWidth/2; t<=lineWidth/2; t += 0.1)
                 {
                     let offset_x = t * (-a) / Math.sqrt(a*a + 1);
                     let offset_y = t / Math.sqrt(a*a + 1);
