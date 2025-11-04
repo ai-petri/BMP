@@ -24,6 +24,18 @@ class PixelData
         return this.offset + this.rowSize*(this.height - Y - 1) + 3*X;
     }
 
+    setPixel(x,y,R,G,B)
+    {
+        let X = Math.round(x);
+        let Y = Math.round(y);
+        if(X < 0 || X > this.width - 1 || Y < 0 || Y > this.height - 1) return;
+
+        let offset = this.getOffset(X,Y);
+        this.buffer.writeUint8(B,offset);
+        this.buffer.writeUint8(G,offset+1);
+        this.buffer.writeUint8(R,offset+2);
+    }
+
     flipHorizontally()
     {
         for(let i=0; i<this.height; i++)
@@ -76,10 +88,7 @@ class PixelData
             for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x++)
             {
                 let y = Math.round(a*x + b);
-                let offset = this.getOffset(x,y);
-                this.buffer.writeUint8(B,offset);
-                this.buffer.writeUint8(G,offset+1);
-                this.buffer.writeUint8(R,offset+2);
+                this.setPixel(x,y,R,G,B);
             }
         }
         else
@@ -91,10 +100,7 @@ class PixelData
                 {
                     let offset_x = t * (-a) / Math.sqrt(a*a + 1);
                     let offset_y = t / Math.sqrt(a*a + 1);
-                    let offset = this.getOffset(x + offset_x, y + offset_y);
-                    this.buffer.writeUint8(B,offset);
-                    this.buffer.writeUint8(G,offset+1);
-                    this.buffer.writeUint8(R,offset+2);
+                    this.setPixel(x + offset_x, y + offset_y, R, G, B);
                 }
             }
             
@@ -129,11 +135,7 @@ class PixelData
             {
                 let offset_x = r*Math.cos(angle);
                 let offset_y = r*Math.sin(angle);
-                let i = this.getOffset(x + offset_x, y + offset_y);
-                this.buffer.writeUint8(B,i);
-                this.buffer.writeUint8(G,i+1);
-                this.buffer.writeUint8(R,i+2);
-                
+                this.setPixel(x + offset_x, y + offset_y, R, G, B);
             }
         }
     }
@@ -143,10 +145,7 @@ class PixelData
         {
             for(let Y=y; Y<y+height; Y++)
             {
-                let i = this.getOffset(X,Y);
-                this.buffer.writeUint8(B,i);
-                this.buffer.writeUint8(G,i+1);
-                this.buffer.writeUint8(R,i+2);
+                this.setPixel(X,Y,R,G,B);
             }
         }
     }
