@@ -121,9 +121,23 @@ class PixelData
         {
             if(lineWidth > 1 && i > 0)
             {
-                this.fillArc(points[i].x, points[i].y, lineWidth/2, 0, 2*Math.PI, R, G, B);
+                this.fillCircle(points[i].x, points[i].y, lineWidth/2, R, G, B);
             }
             this.strokeLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, R, G, B, lineWidth);
+        }
+    }
+
+    fillCircle(x,y,radius,R=0,G=0,B=0)
+    {
+        for(let X=x-radius; X<=x+radius; X++)
+        {
+            for(let Y=y-radius; Y<=y+radius; Y++)
+            {
+                if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
+                {
+                    this.setPixel(X,Y,R,G,B);
+                }
+            }
         }
     }
 
