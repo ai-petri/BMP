@@ -1,3 +1,5 @@
+const Context = require("./Context");
+
 class PixelData
 {
     /**
@@ -47,6 +49,11 @@ class PixelData
         this.buffer.writeUint8(B,offset);
         this.buffer.writeUint8(G,offset+1);
         this.buffer.writeUint8(R,offset+2);
+    }
+
+    getContext()
+    {
+        return new Context(this.width,this.height,this.getPixel,this.setPixel)
     }
 
     flipHorizontally()
