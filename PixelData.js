@@ -24,6 +24,19 @@ class PixelData
         return this.offset + this.rowSize*(this.height - Y - 1) + 3*X;
     }
 
+    getPixel(x,y)
+    {
+        let X = Math.round(x);
+        let Y = Math.round(y);
+        if(X < 0 || X > this.width - 1 || Y < 0 || Y > this.height - 1) return;
+
+        let offset = this.getOffset(X,Y);
+        let B = this.buffer.readUint8(offset);
+        let G = this.buffer.readUint8(offset+1);
+        let R = this.buffer.readUint8(offset+2);
+        return {R,G,B};
+    }
+
     setPixel(x,y,R,G,B)
     {
         let X = Math.round(x);
