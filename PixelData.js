@@ -53,7 +53,7 @@ class PixelData
 
     getContext()
     {
-        return new Context(this.width,this.height,this.getPixel,this.setPixel)
+        return new Context(this.width,this.height,this.getPixel.bind(this),this.setPixel.bind(this))
     }
 
     flipHorizontally()
