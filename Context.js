@@ -1,8 +1,24 @@
+const Color = require("./Color");
+
 function Context(width,height,getPixel,setPixel)
 {
     let path = [];
     let x = 0;
     let y = 0;
+    let fillColor = new Color();
+    let strokeColor = new Color();
+    
+    Object.defineProperty(this,"fillStyle",
+    {
+        get: function(){return fillColor.toHex()},
+        set: function(str){fillColor = new Color(str)}
+    })
+
+    Object.defineProperty(this,"strokeStyle",
+    {
+        get: function(){return strokeColor.toHex()},
+        set: function(str){strokeColor = new Color(str)}
+    })
 
     this.beginPath = function()
     {
@@ -68,7 +84,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
                         {
-                            setPixel(X,Y,0,0,0)
+                            setPixel(X,Y,strokeColor.R,strokeColor.G,strokeColor.B,strokeColor.A)
                             if(D>0)
                             {
                                 Y+=stepY;
@@ -89,7 +105,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
                         {
-                            setPixel(X,Y,0,0,0)
+                            setPixel(X,Y,strokeColor.R,strokeColor.G,strokeColor.B,strokeColor.A);
                             if(D>0)
                             {
                                 X+=stepX;
