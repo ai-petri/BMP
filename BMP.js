@@ -3,7 +3,7 @@ const PixelData = require("./PixelData");
 
 class BMP
 {
-    constuctor(buffer)
+    constructor(buffer)
     {
         let signature = String.fromCharCode(buffer[0],buffer[1]);
         if(signature !== "BM") return;
