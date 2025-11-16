@@ -20,6 +20,8 @@ function Context(width,height,getPixel,setPixel)
         set: function(str){strokeColor = new Color(str)}
     })
 
+    this.antialiasEnabled = true;
+
     this.beginPath = function()
     {
         path = [];
@@ -54,15 +56,16 @@ function Context(width,height,getPixel,setPixel)
                     let y1 = y;
                     let x2 = path[i+1];
                     let y2 = path[i+2];
+                    let {R,G,B,A} = strokeColor;
                     if(Math.abs(x2-x1)>Math.abs(y2-y1))
                     {
                         if(x1>x2) swap();
-                        f1();
+                        if(this.antialiasEnabled) f1a(); else f1();
                     }
                     else
                     {
                         if(y1>y2) swap();
-                        f2();
+                        if(this.antialiasEnabled) f2a(); else f2();
                     }
                     function swap()
                     {  
@@ -84,7 +87,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
                         {
-                            setPixel(X,Y,strokeColor.R,strokeColor.G,strokeColor.B,strokeColor.A)
+                            setPixel(X,Y,R,G,B,A)
                             if(D>0)
                             {
                                 Y+=stepY;
@@ -92,6 +95,22 @@ function Context(width,height,getPixel,setPixel)
                             }
                             D += 2*dy
                         }
+                    }
+                    function f1a()
+                    {
+                        let dx = x2 - x1;
+                        let dy = y2 - y1;
+                        let slope = dx==0 ? 1 : dy / dx;
+                                            
+                        for(let X = x1, Y = y1; X < x2; X++)
+                        {
+                            let intY = Math.floor(Y);
+                            let fracY = Y - intY;
+                            setPixel(X,intY,R,G,B,A* (1-fracY));
+                            setPixel(X,intY+1,R,G,B,A * fracY);
+                            Y += slope;
+                        }
+                        setPixel(x2,y2,R,G,B,A);
                     }
                     function f2()
                     {
@@ -105,7 +124,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
                         {
-                            setPixel(X,Y,strokeColor.R,strokeColor.G,strokeColor.B,strokeColor.A);
+                            setPixel(X,Y,R,G,B,A);
                             if(D>0)
                             {
                                 X+=stepX;
@@ -113,6 +132,22 @@ function Context(width,height,getPixel,setPixel)
                             }
                             D += 2*dx;
                         }
+                    }
+                    function f2a()
+                    {
+                        let dx = x2 - x1;
+                        let dy = y2 - y1;
+                        let slope = dy==0? 1 : dx / dy;
+
+                        for(let X = x1, Y = y1; Y < y2; Y++)
+                        {
+                            let intX = Math.floor(X);
+                            let fracX = X - intX;
+                            setPixel(intX,Y,R,G,B,A * (1-fracX));
+                            setPixel(intX+1,Y,R,G,B,A * fracX);
+                            X += slope;
+                        }
+                        setPixel(x2,y2,R,G,B,A);
                     }
                     x = path[i+1];
                     y = path[i+2];
