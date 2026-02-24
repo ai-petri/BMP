@@ -24,32 +24,25 @@ class BMP
     {
         let pixelDataOffset = 54;
         let size = pixelDataOffset + height * Math.ceil(width*3/4)*4;
-        this.buffer = Buffer.alloc(size);
-        this.buffer.write("BM");
-        this.buffer.writeUint32LE(size,2);
-        this.buffer.writeUint32LE(pixelDataOffset,10);
+        let buffer = Buffer.alloc(size);
+        buffer.write("BM");
+        buffer.writeUint32LE(size,2);
+        buffer.writeUint32LE(pixelDataOffset,10);
 
-        this.header = new BitmapInfoHeader(this.buffer);
-        this.header.headerSize = 40;
-        this.header.width = width;
-        this.header.height = height;
-        this.header.numberOfColorPlanes = 1;
-        this.header.bitsPerPixel = 24;
-        this.header.compression = 0;
-        this.header.sizeOfBitmapData = 0;
-        this.header.horizontalResolution = 0;
-        this.header.verticalResolution = 0;
-        this.header.numberOfColorsInPalette = 0;
-        this.header.numberOfImportantColors = 0;
+        let header = new BitmapInfoHeader(buffer);
+        header.headerSize = 40;
+        header.width = width;
+        header.height = height;
+        header.numberOfColorPlanes = 1;
+        header.bitsPerPixel = 24;
+        header.compression = 0;
+        header.sizeOfBitmapData = 0;
+        header.horizontalResolution = 0;
+        header.verticalResolution = 0;
+        header.numberOfColorsInPalette = 0;
+        header.numberOfImportantColors = 0;
 
-        this.pixelData = new PixelData(this.buffer,
-        {
-            offset: pixelDataOffset,
-            width,
-            height
-        });
-
-        return this;
+        return new BMP(buffer);
     }
 
 }
