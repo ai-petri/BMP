@@ -45,6 +45,11 @@ class BMP
         return new BMP(buffer);
     }
 
+    getContext()
+    {
+        return this.pixelData.getContext();
+    }
+
 }
 
 module.exports = BMP
