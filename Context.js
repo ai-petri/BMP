@@ -7,6 +7,47 @@ function Context(width,height,getPixel,setPixel)
     let y = 0;
     let fillColor = new Color();
     let strokeColor = new Color();
+    this.lineWidth = 1;
+    
+    let drawPoint = (x,y,R,G,B,A)=>
+    {
+        if(this.lineWidth <= 1)
+        {
+            setPixel(x,y,R,G,B,A)
+        }
+        else
+        {
+            let radius = this.lineWidth / 2;
+
+            if(this.antialiasEnabled)
+            {
+                for(let X=x-radius; X<=x+radius; X++)
+                {
+                    for(let Y=y-radius; Y<=y+radius; Y++)
+                    {
+                        let dist = Math.sqrt((X-x)*(X-x) + (Y-y)*(Y-y));
+                        let coverage =  1 - (dist - radius);
+                        coverage = Math.min(Math.max(coverage, 0), 1);
+                        setPixel(X, Y, R, G, B, A*coverage);
+                    }
+                }
+            }
+            else
+            {
+                for(let X=x-radius; X<=x+radius; X++)
+                {
+                    for(let Y=y-radius; Y<=y+radius; Y++)
+                    {
+                        if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
+                        {
+                            setPixel(X,Y,R,G,B,A);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
     
     Object.defineProperty(this,"fillStyle",
     {
@@ -87,7 +128,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
                         {
-                            setPixel(X,Y,R,G,B,A)
+                            drawPoint(X,Y,R,G,B,A)
                             if(D>0)
                             {
                                 Y+=stepY;
@@ -106,11 +147,11 @@ function Context(width,height,getPixel,setPixel)
                         {
                             let intY = Math.floor(Y);
                             let fracY = Y - intY;
-                            setPixel(X,intY,R,G,B,A* (1-fracY));
-                            setPixel(X,intY+1,R,G,B,A * fracY);
+                            drawPoint(X,intY,R,G,B,A* (1-fracY));
+                            drawPoint(X,intY+1,R,G,B,A * fracY);
                             Y += slope;
                         }
-                        setPixel(x2,y2,R,G,B,A);
+                        drawPoint(x2,y2,R,G,B,A);
                     }
                     function f2()
                     {
@@ -124,7 +165,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
                         {
-                            setPixel(X,Y,R,G,B,A);
+                            drawPoint(X,Y,R,G,B,A);
                             if(D>0)
                             {
                                 X+=stepX;
@@ -143,11 +184,11 @@ function Context(width,height,getPixel,setPixel)
                         {
                             let intX = Math.floor(X);
                             let fracX = X - intX;
-                            setPixel(intX,Y,R,G,B,A * (1-fracX));
-                            setPixel(intX+1,Y,R,G,B,A * fracX);
+                            drawPoint(intX,Y,R,G,B,A * (1-fracX));
+                            drawPoint(intX+1,Y,R,G,B,A * fracX);
                             X += slope;
                         }
-                        setPixel(x2,y2,R,G,B,A);
+                        drawPoint(x2,y2,R,G,B,A);
                     }
                     x = path[i+1];
                     y = path[i+2];
