@@ -20,9 +20,9 @@ class Color
             {
                 [this.R,this.G,this.B] = str.slice(4,-1).split(",").map(Number);
             }
-            else if(/rgba\(\d+\,\d+\,\d+\,\d+\)/.test(str))
+            else if(/rgba\(\d+\,\d+\,\d+\,\d+(\.\d+)?\)/.test(str))
             {
-                [this.R,this.G,this.B,this.A] = str.slice(4,-1).split(",").map(Number);
+                [this.R,this.G,this.B,this.A] = str.slice(5,-1).split(",").map(Number);
             }
         }
         else if(params.length == 3)
