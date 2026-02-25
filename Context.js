@@ -8,12 +8,26 @@ function Context(width,height,getPixel,setPixel)
     let fillColor = new Color();
     let strokeColor = new Color();
     this.lineWidth = 1;
-    
-    let drawPoint = (x,y,R,G,B,A)=>
+    let pixelCoverages = {};
+    let render = _=>
+    {
+        let {R,G,B,A} = strokeColor;
+        for(let coords in pixelCoverages)
+        {
+            let [x,y] = coords.split("-").map(Number);
+            let coverage = pixelCoverages[coords];
+            if(coverage>0)
+            {
+                setPixel(x,y,R,G,B,A*coverage);
+            }
+        }
+        pixelCoverages = {};
+    }
+    let drawPoint = (x,y,coverage)=>
     {
         if(this.lineWidth <= 1)
         {
-            setPixel(x,y,R,G,B,A)
+            pixelCoverages[`${x}-${y}`] = coverage;
         }
         else
         {
@@ -26,9 +40,20 @@ function Context(width,height,getPixel,setPixel)
                     for(let Y=y-radius; Y<=y+radius; Y++)
                     {
                         let dist = Math.sqrt((X-x)*(X-x) + (Y-y)*(Y-y));
-                        let coverage =  1 - (dist - radius);
-                        coverage = Math.min(Math.max(coverage, 0), 1);
-                        setPixel(X, Y, R, G, B, A*coverage);
+                        let t = Math.min(radius/5, 1);
+                        let linear = Math.max(0, 1 - dist/radius);
+                        let gaussian = Math.exp(-(dist*dist) / (2 * (radius/2)*(radius/2)));
+                        coverage = (1-t)*linear + t*gaussian;
+
+
+                        if(pixelCoverages[`${X}-${Y}`])
+                        {
+                            pixelCoverages[`${X}-${Y}`] = Math.max(coverage, pixelCoverages[`${X}-${Y}`])
+                        }
+                        else
+                        {
+                            pixelCoverages[`${X}-${Y}`] = coverage;
+                        }
                     }
                 }
             }
@@ -40,7 +65,7 @@ function Context(width,height,getPixel,setPixel)
                     {
                         if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
                         {
-                            setPixel(X,Y,R,G,B,A);
+                            pixelCoverages[`${X}-${Y}`] = 1;
                         }
                     }
                 }
@@ -97,7 +122,6 @@ function Context(width,height,getPixel,setPixel)
                     let y1 = y;
                     let x2 = path[i+1];
                     let y2 = path[i+2];
-                    let {R,G,B,A} = strokeColor;
                     if(Math.abs(x2-x1)>Math.abs(y2-y1))
                     {
                         if(x1>x2) swap();
@@ -128,7 +152,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
                         {
-                            drawPoint(X,Y,R,G,B,A)
+                            drawPoint(X,Y,1)
                             if(D>0)
                             {
                                 Y+=stepY;
@@ -147,11 +171,11 @@ function Context(width,height,getPixel,setPixel)
                         {
                             let intY = Math.floor(Y);
                             let fracY = Y - intY;
-                            drawPoint(X,intY,R,G,B,A* (1-fracY));
-                            drawPoint(X,intY+1,R,G,B,A * fracY);
+                            drawPoint(X,intY,(1-fracY));
+                            drawPoint(X,intY+1,fracY);
                             Y += slope;
                         }
-                        drawPoint(x2,y2,R,G,B,A);
+                        drawPoint(x2,y2,1);
                     }
                     function f2()
                     {
@@ -165,7 +189,7 @@ function Context(width,height,getPixel,setPixel)
                         }
                         for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
                         {
-                            drawPoint(X,Y,R,G,B,A);
+                            drawPoint(X,Y,1);
                             if(D>0)
                             {
                                 X+=stepX;
@@ -184,14 +208,16 @@ function Context(width,height,getPixel,setPixel)
                         {
                             let intX = Math.floor(X);
                             let fracX = X - intX;
-                            drawPoint(intX,Y,R,G,B,A * (1-fracX));
-                            drawPoint(intX+1,Y,R,G,B,A * fracX);
+                            drawPoint(intX,Y,(1-fracX));
+                            drawPoint(intX+1,Y,fracX);
                             X += slope;
                         }
-                        drawPoint(x2,y2,R,G,B,A);
+                        drawPoint(x2,y2);
                     }
                     x = path[i+1];
                     y = path[i+2];
+
+                    render();
                 }
                 i += 3;
                 break;
