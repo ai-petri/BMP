@@ -103,6 +103,11 @@ function Context(width,height,getPixel,setPixel)
         path.push(1,x,y);
     }
 
+    this.arc = function(cx, cy, radius, startAngle, endAngle, counterclockwise=false)
+    {
+        path.push(2, cx, cy, radius, startAngle, endAngle, counterclockwise);
+    }
+
     this.stroke = function()
     {
         let i=0;
@@ -222,6 +227,49 @@ function Context(width,height,getPixel,setPixel)
                 i += 3;
                 break;
 
+                case 2: //arc
+                {
+                    let cx = path[i+1];
+                    let cy = path[i+2];
+                    let radius = path[i+3];
+                    let startAngle = path[i+4];
+                    let endAngle = path[i+5];
+                    let counterclockwise = path[i+6];
+                    
+                    if(counterclockwise)
+                    {
+                        if(startAngle<endAngle) 
+                            startAngle += 2*Math.PI;
+
+                        for(let angle=startAngle; angle>=endAngle; angle-=0.01) 
+                            plot(angle);
+                    }
+                    else
+                    {
+                        if(startAngle>endAngle) 
+                            startAngle -= 2*Math.PI;
+
+                        for(let angle=startAngle; angle<=endAngle; angle+=0.01) 
+                            plot(angle);
+                    }
+
+                    function plot(angle)
+                    {
+                        let x = cx + radius*Math.cos(angle);
+                        let y = cy + radius*Math.sin(angle);
+                        xi = Math.floor(x);
+                        yi = Math.floor(y);
+                        fracX = x - xi;
+                        fracY = y - yi;
+
+                        drawPoint(xi, yi, (1-fracX)*(1-fracY));
+                        drawPoint(xi+1, yi, fracX*(1-fracY));
+                        drawPoint(xi, yi+1, (1-fracX)*fracY);
+                        drawPoint(xi+1, yi+1, fracX*fracY);
+                    }
+                    render();
+                    i+=7;
+                }
             }
         }
     }
