@@ -108,6 +108,11 @@ function Context(width,height,getPixel,setPixel)
         path.push(2, cx, cy, radius, startAngle, endAngle, counterclockwise);
     }
 
+    this.arcTo = function(x1, y1, x2, y2, radius)
+    {
+        path.push(3, x1, y1, x2, y2, radius);
+    }
+
     this.stroke = function()
     {
         let i=0;
@@ -268,8 +273,79 @@ function Context(width,height,getPixel,setPixel)
                         drawPoint(xi+1, yi+1, fracX*fracY);
                     }
                     render();
-                    i+=7;
                 }
+                i+=7;
+                break;
+
+                case 3: //arcTo
+                {
+                    let x1 = path[i+1];
+                    let y1 = path[i+2];
+                    let x2 = path[i+3];
+                    let y2 = path[i+4];
+                    let r = path[i+5];
+                    let dx1 = x1 - x;
+                    let dy1 = y1 - y;
+                    let dx2 = x2 - x1;
+                    let dy2 = y2 - y1;
+                    let len1 = Math.hypot(dx1, dy1);
+                    let len2 = Math.hypot(dx2, dy2);
+                    if (len1 == 0 || len2 == 0 || r == 0) break;
+                    let ux1 = dx1 / len1;
+                    let uy1 = dy1 / len1;
+                    let ux2 = dx2 / len2;
+                    let uy2 = dy2 / len2;
+                    let tx = ux1 + ux2;
+                    let ty = uy1 + uy2;
+                    let tlen = Math.hypot(tx, ty);
+                    let bx = tx / tlen;
+                    let by = ty / tlen;
+                    let cos_theta = ux1*ux2 + uy1*uy2;
+                    let theta = Math.acos(Math.max(-1, Math.min(1, cos_theta)));
+                    let d = r / Math.sin(theta / 2);
+                    let k = 1;    
+                    let cx = x1 + bx * d;
+                    let cy = y1 - by *  d;
+                    if (Math.abs(Math.hypot(x - cx, y - cy) - r) > 0.1 
+                    || Math.abs(Math.hypot(x2 - cx, y2 - cy) - r) > 0.1) 
+                    {
+                        k = -1;
+                        cx = x1 - bx * d;
+                        cy = y1 + by * d;
+                    }
+                    let startAngle = Math.atan2(y - cy, x - cx);
+                    let endAngle = Math.atan2(y2 - cy, x2 - cy);
+                    
+                    if(k==1)
+                    {
+                        //TODO
+                    }
+
+                    console.log(k,[startAngle/Math.PI,endAngle/Math.PI])
+
+
+                    for(let angle = startAngle; angle < endAngle; angle += 0.01) 
+                    {
+                        let x = cx + r*Math.cos(angle);
+                        let y = cy + r*Math.sin(angle);
+                        xi = Math.floor(x);
+                        yi = Math.floor(y);
+                        fracX = x - xi;
+                        fracY = y - yi;
+
+                        drawPoint(xi, yi, (1-fracX)*(1-fracY));
+                        drawPoint(xi+1, yi, fracX*(1-fracY));
+                        drawPoint(xi, yi+1, (1-fracX)*fracY);
+                        drawPoint(xi+1, yi+1, fracX*fracY);
+                    }
+
+                    
+                    render();
+                    x = x2;
+                    y = y2;
+                }
+                i += 6;
+                break;
             }
         }
     }
