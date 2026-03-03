@@ -140,6 +140,28 @@ class BMP
             }
         }
     }
+       fillArc(x,y,radius,startAngle,endAngle,R=0,G=0,B=0)
+    {    
+        for(let X=x-radius; X<=x+radius; X++)
+        {
+            for(let Y=y-radius; Y<=y+radius; Y++)
+            {
+                if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
+                {
+                    let angle = Math.atan2(Y-y, X-x);
+                    if(angle < 0)
+                    {
+                        angle += 2*Math.PI;
+                    }
+                    
+                    if(angle > startAngle && angle < endAngle)
+                    {
+                        this.pixelData.setPixel(X,Y,R,G,B);
+                    }
+                }
+            }
+        }
+    }
 }
 
 module.exports = BMP
