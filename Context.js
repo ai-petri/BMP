@@ -278,56 +278,81 @@ function Context(width,height,getPixel,setPixel)
                 break;
 
                 case 3: //arcTo
-                {
+{
                     let x1 = path[i+1];
                     let y1 = path[i+2];
                     let x2 = path[i+3];
                     let y2 = path[i+4];
                     let r = path[i+5];
-                    let dx1 = x1 - x;
-                    let dy1 = y1 - y;
-                    let dx2 = x2 - x1;
-                    let dy2 = y2 - y1;
-                    let len1 = Math.hypot(dx1, dy1);
-                    let len2 = Math.hypot(dx2, dy2);
-                    if (len1 == 0 || len2 == 0 || r == 0) break;
-                    let ux1 = dx1 / len1;
-                    let uy1 = dy1 / len1;
-                    let ux2 = dx2 / len2;
-                    let uy2 = dy2 / len2;
-                    let tx = ux1 + ux2;
-                    let ty = uy1 + uy2;
-                    let tlen = Math.hypot(tx, ty);
-                    let bx = tx / tlen;
-                    let by = ty / tlen;
-                    let cos_theta = ux1*ux2 + uy1*uy2;
-                    let theta = Math.acos(Math.max(-1, Math.min(1, cos_theta)));
-                    let d = r / Math.sin(theta / 2);
-                    let k = 1;    
-                    let cx = x1 + bx * d;
-                    let cy = y1 - by *  d;
-                    if (Math.abs(Math.hypot(x - cx, y - cy) - r) > 0.1 
-                    || Math.abs(Math.hypot(x2 - cx, y2 - cy) - r) > 0.1) 
-                    {
-                        k = -1;
-                        cx = x1 - bx * d;
-                        cy = y1 + by * d;
-                    }
-                    let startAngle = Math.atan2(y - cy, x - cx);
-                    let endAngle = Math.atan2(y2 - cy, x2 - cy);
                     
-                    if(k==1)
+
+                    function rotate90CW(vec) 
                     {
-                        //TODO
+                        return [vec[1], -vec[0]];
+                    }
+                    function rotate90CCW(vec) 
+                    {
+                        return [-vec[1], vec[0]];
+                    } 
+                    function mul(k,vec) 
+                    {
+                        return [k*vec[0], k*vec[1]];
+                    }
+                    function dotProduct(vec1, vec2)
+                    {
+                        return vec1[0]*vec2[0] + vec1[1]*vec2[1];
+                    }
+                    function det(vec1, vec2)
+                    {
+                        return vec1[0]*vec2[1] - vec1[1]*vec2[0];
+                    }
+                    function sum(vec1, vec2)
+                    {
+                        return [vec1[0]+vec2[0], vec1[1]+vec2[1]]
+                    }
+                    function normalize(vec)
+                    {
+                        let length = Math.hypot(...vec);
+                        vec[0] /= length;
+                        vec[1] /= length;
                     }
 
-                    console.log(k,[startAngle/Math.PI,endAngle/Math.PI])
+                    let v1 = [x-x1, y-y1];
+                    normalize(v1);
+                    let v2 = [x2-x1, y2-y1];
+                    normalize(v2);
+                    let b = sum(v1,v2);
+                    normalize(b);
 
+                    let angle = Math.acos(dotProduct(v1,v2));
+                    let d = r/Math.sin(angle/2);
+                    let center = sum([x1,y1],mul(d,b));
+                    
+                    let t1,t2;
+                    if(det(v1,v2)>0)
+                    {
+                        t1 = sum(center,mul(r,rotate90CW(v1)));
+                        t2 = sum(center, mul(r, rotate90CCW(v2)));
+                    }
+                    else
+                    {
+                        t1 = sum(center, mul(r, rotate90CCW(v1)));
+                        t2 = sum(center,mul(r,rotate90CW(v2)));
+                    }
+                    let startAngle = Math.atan2(t1[1] - center[1], t1[0] - center[0]);
+                    let endAngle =  Math.atan2(t2[1] - center[1], t2[0] - center[0]);
+
+                    if(startAngle > endAngle)
+                    {
+                       let temp = startAngle;
+                       startAngle = endAngle;
+                       endAngle = temp;
+                    }
 
                     for(let angle = startAngle; angle < endAngle; angle += 0.01) 
                     {
-                        let x = cx + r*Math.cos(angle);
-                        let y = cy + r*Math.sin(angle);
+                        let x = center[0] + r*Math.cos(angle);
+                        let y = center[1] + r*Math.sin(angle);
                         xi = Math.floor(x);
                         yi = Math.floor(y);
                         fracX = x - xi;
@@ -341,8 +366,8 @@ function Context(width,height,getPixel,setPixel)
 
                     
                     render();
-                    x = x2;
-                    y = y2;
+                    x = x1;
+                    y = y1;
                 }
                 i += 6;
                 break;
