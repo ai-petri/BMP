@@ -99,19 +99,7 @@ class PixelData
         }
     }
 
-    fillCircle(x,y,radius,R=0,G=0,B=0)
-    {
-        for(let X=x-radius; X<=x+radius; X++)
-        {
-            for(let Y=y-radius; Y<=y+radius; Y++)
-            {
-                if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
-                {
-                    this.setPixel(X,Y,R,G,B);
-                }
-            }
-        }
-    }
+
 
     fillArc(x,y,radius,startAngle,endAngle,R=0,G=0,B=0)
     {    

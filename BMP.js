@@ -127,6 +127,19 @@ class BMP
             
         }
     }
+    fillCircle(x,y,radius,R=0,G=0,B=0)
+    {
+        for(let X=x-radius; X<=x+radius; X++)
+        {
+            for(let Y=y-radius; Y<=y+radius; Y++)
+            {
+                if((X-x)*(X-x) + (Y-y)*(Y-y) <= radius*radius)
+                {
+                    this.pixelData.setPixel(X,Y,R,G,B);
+                }
+            }
+        }
+    }
 }
 
 module.exports = BMP
