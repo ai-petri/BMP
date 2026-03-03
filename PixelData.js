@@ -77,40 +77,7 @@ class PixelData
 
     
 
-    strokeLine(x1,y1,x2,y2,R=0,G=0,B=0,lineWidth=1)
-    {
-        if(x1 == x2)
-        {
-            this.fillRect(x1,y1,lineWidth,Math.abs(y2-y1));
-            return;
-        }
-
-        let a = (y2 - y1) / (x2 - x1);
-        let b = y1 - a*x1;
-
-        if(lineWidth == 1)
-        {
-            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x++)
-            {
-                let y = Math.round(a*x + b);
-                this.setPixel(x,y,R,G,B);
-            }
-        }
-        else
-        {
-            for(let x=Math.min(x1,x2); x<=Math.max(x1,x2); x += 0.1)
-            {
-                let y = a*x + b;
-                for(let t=-lineWidth/2; t<=lineWidth/2; t += 0.1)
-                {
-                    let offset_x = t * (-a) / Math.sqrt(a*a + 1);
-                    let offset_y = t / Math.sqrt(a*a + 1);
-                    this.setPixel(x + offset_x, y + offset_y, R, G, B);
-                }
-            }
-            
-        }
-    }
+    
     /**
      * @param {Array<{x:Number,y:Number}>} points 
      * @param {Number} R 
