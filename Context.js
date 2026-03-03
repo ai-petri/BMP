@@ -73,6 +73,104 @@ function Context(width,height,getPixel,setPixel)
 
         }
     }
+    let line = (x1,y1,x2,y2) =>
+    {
+        if(Math.abs(x2-x1)>Math.abs(y2-y1))
+        {
+            if(x1>x2) swap();
+            if(this.antialiasEnabled) f1a(); else f1();
+        }
+        else
+        {
+            if(y1>y2) swap();
+            if(this.antialiasEnabled) f2a(); else f2();
+        }
+        function swap()
+        {  
+            let temp = [x2,y2]
+            x2 = x1
+            y2 = y1
+            x1 = temp[0]
+            y1 = temp[1]
+        }
+        function f1()
+        {               
+            let dx = x2 - x1
+            let dy = y2 - y1 
+            let stepY = 1;
+            if(dy<0)
+            {
+                stepY = -1
+                dy = -dy
+            }
+            for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
+            {
+                drawPoint(X,Y,1)
+                if(D>0)
+                {
+                    Y+=stepY;
+                    D -= 2*dx
+                }
+                D += 2*dy
+            }
+        }
+        function f1a()
+        {
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            let slope = dx==0 ? 1 : dy / dx;
+                                
+            for(let X = x1, Y = y1; X < x2; X++)
+            {
+                let intY = Math.floor(Y);
+                let fracY = Y - intY;
+                drawPoint(X,intY,(1-fracY));
+                drawPoint(X,intY+1,fracY);
+                Y += slope;
+            }
+            drawPoint(x2,y2,1);
+        }
+        function f2()
+        {
+            let dx = x2 - x1
+            let dy = y2 - y1 
+            let stepX = 1
+            if(dx<0)
+            {
+                stepX = -1
+                dx = -dx
+            }
+            for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
+            {
+                drawPoint(X,Y,1);
+                if(D>0)
+                {
+                    X+=stepX;
+                    D -= 2*dy;
+                }
+                D += 2*dx;
+            }
+        }
+        function f2a()
+        {
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            let slope = dy==0? 1 : dx / dy;
+
+            for(let X = x1, Y = y1; Y < y2; Y++)
+            {
+                let intX = Math.floor(X);
+                let fracX = X - intX;
+                drawPoint(intX,Y,(1-fracX));
+                drawPoint(intX+1,Y,fracX);
+                X += slope;
+            }
+            drawPoint(x2,y2);
+        }
+        
+
+        render();
+    }
     
     Object.defineProperty(this,"fillStyle",
     {
@@ -116,6 +214,7 @@ function Context(width,height,getPixel,setPixel)
     this.stroke = function()
     {
         let i=0;
+        
         while(i<path.length)
         {
             switch(path[i])
@@ -132,102 +231,9 @@ function Context(width,height,getPixel,setPixel)
                     let y1 = y;
                     let x2 = path[i+1];
                     let y2 = path[i+2];
-                    if(Math.abs(x2-x1)>Math.abs(y2-y1))
-                    {
-                        if(x1>x2) swap();
-                        if(this.antialiasEnabled) f1a(); else f1();
-                    }
-                    else
-                    {
-                        if(y1>y2) swap();
-                        if(this.antialiasEnabled) f2a(); else f2();
-                    }
-                    function swap()
-                    {  
-                        let temp = [x2,y2]
-                        x2 = x1
-                        y2 = y1
-                        x1 = temp[0]
-                        y1 = temp[1]
-                    }
-                    function f1()
-                    {               
-                        let dx = x2 - x1
-                        let dy = y2 - y1 
-                        let stepY = 1;
-                        if(dy<0)
-                        {
-                            stepY = -1
-                            dy = -dy
-                        }
-                        for(let X = x1, Y = y1, D = 2*dy - dx; X < x2; X++)
-                        {
-                            drawPoint(X,Y,1)
-                            if(D>0)
-                            {
-                                Y+=stepY;
-                                D -= 2*dx
-                            }
-                            D += 2*dy
-                        }
-                    }
-                    function f1a()
-                    {
-                        let dx = x2 - x1;
-                        let dy = y2 - y1;
-                        let slope = dx==0 ? 1 : dy / dx;
-                                            
-                        for(let X = x1, Y = y1; X < x2; X++)
-                        {
-                            let intY = Math.floor(Y);
-                            let fracY = Y - intY;
-                            drawPoint(X,intY,(1-fracY));
-                            drawPoint(X,intY+1,fracY);
-                            Y += slope;
-                        }
-                        drawPoint(x2,y2,1);
-                    }
-                    function f2()
-                    {
-                        let dx = x2 - x1
-                        let dy = y2 - y1 
-                        let stepX = 1
-                        if(dx<0)
-                        {
-                            stepX = -1
-                            dx = -dx
-                        }
-                        for(let X = x1, Y = y1, D = 2*dx - dy; Y < y2; Y++)
-                        {
-                            drawPoint(X,Y,1);
-                            if(D>0)
-                            {
-                                X+=stepX;
-                                D -= 2*dy;
-                            }
-                            D += 2*dx;
-                        }
-                    }
-                    function f2a()
-                    {
-                        let dx = x2 - x1;
-                        let dy = y2 - y1;
-                        let slope = dy==0? 1 : dx / dy;
-
-                        for(let X = x1, Y = y1; Y < y2; Y++)
-                        {
-                            let intX = Math.floor(X);
-                            let fracX = X - intX;
-                            drawPoint(intX,Y,(1-fracX));
-                            drawPoint(intX+1,Y,fracX);
-                            X += slope;
-                        }
-                        drawPoint(x2,y2);
-                    }
+                    line(x1,y1,x2,y2);
                     x = path[i+1];
                     y = path[i+2];
-
-                    render();
                 }
                 i += 3;
                 break;
@@ -348,6 +354,8 @@ function Context(width,height,getPixel,setPixel)
                        startAngle = endAngle;
                        endAngle = temp;
                     }
+
+                    line(x,y,...t1);
 
                     for(let angle = startAngle; angle < endAngle; angle += 0.01) 
                     {
