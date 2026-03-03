@@ -75,17 +75,7 @@ class PixelData
 
     
 
-    strokeRect(x,y,width,height,R=0,G=0,B=0,lineWidth=1)
-    {
-        let top = Math.round(y-lineWidth/2);
-        let left = Math.round(x-lineWidth/2);
-        let W = width + lineWidth;
-        let H = height + lineWidth;
-        this.fillRect(left, top, W, lineWidth, R, G, B);
-        this.fillRect(left + width, top, lineWidth, H, R, G, B);
-        this.fillRect(left, top + height, W, lineWidth, R, G, B);
-        this.fillRect(left, top, lineWidth, H, R, G, B);
-    }
+    
 
     strokeLine(x1,y1,x2,y2,R=0,G=0,B=0,lineWidth=1)
     {
@@ -179,16 +169,7 @@ class PixelData
         }
     }
 
-    fillRect(x,y,width,height,R=0,G=0,B=0)
-    {
-        for(let X=x; X<x+width; X++)
-        {
-            for(let Y=y; Y<y+height; Y++)
-            {
-                this.setPixel(X,Y,R,G,B);
-            }
-        }
-    }
+    
 
 }
 

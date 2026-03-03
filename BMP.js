@@ -72,7 +72,27 @@ class BMP
             clone.copy(this.buffer, rowOffset1, rowOffset2);
         }
     }
-
+    fillRect(x,y,width,height,R=0,G=0,B=0)
+    {
+        for(let X=x; X<x+width; X++)
+        {
+            for(let Y=y; Y<y+height; Y++)
+            {
+                this.pixelData.setPixel(X,Y,R,G,B);
+            }
+        }
+    }
+    strokeRect(x,y,width,height,R=0,G=0,B=0,lineWidth=1)
+    {
+        let top = Math.round(y-lineWidth/2);
+        let left = Math.round(x-lineWidth/2);
+        let W = width + lineWidth;
+        let H = height + lineWidth;
+        this.fillRect(left, top, W, lineWidth, R, G, B);
+        this.fillRect(left + width, top, lineWidth, H, R, G, B);
+        this.fillRect(left, top + height, W, lineWidth, R, G, B);
+        this.fillRect(left, top, lineWidth, H, R, G, B);
+    }
 }
 
 module.exports = BMP
