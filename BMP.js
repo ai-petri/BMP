@@ -50,6 +50,19 @@ class BMP
         return this.pixelData.getContext();
     }
 
+    flipHorizontally()
+    {
+        for(let i=0; i<this.height; i++)
+        {
+            let rowOffset = this.pixelData.offset + i*this.pixelData.rowSize;
+            let row = Buffer.from(this.buffer.subarray(rowOffset, rowOffset + 3*this.width));
+            for(let x=0; x<this.pixelData.width; x++)
+            {
+                row.copy(this.buffer, rowOffset + 3*x, row.length - 3*(x+1), row.length - 3*x);
+            }
+        }
+    }
+
 }
 
 module.exports = BMP

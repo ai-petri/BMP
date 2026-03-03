@@ -73,18 +73,7 @@ class PixelData
         return new Context(this.width,this.height,this.getPixel.bind(this),this.setPixel.bind(this))
     }
 
-    flipHorizontally()
-    {
-        for(let i=0; i<this.height; i++)
-        {
-            let rowOffset = this.offset + i*this.rowSize;
-            let row = Buffer.from(this.buffer.subarray(rowOffset, rowOffset + 3*this.width));
-            for(let x=0; x<this.width; x++)
-            {
-                row.copy(this.buffer, rowOffset + 3*x, row.length - 3*(x+1), row.length - 3*x);
-            }
-        }
-    }
+    
 
     flipVertically()
     {
