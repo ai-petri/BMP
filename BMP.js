@@ -62,6 +62,16 @@ class BMP
             }
         }
     }
+    flipVertically()
+    {
+        let clone = Buffer.from(this.buffer);
+        for(let i=0; i<this.pixelData.height; i++)
+        {
+            let rowOffset1 = this.pixelData.offset + i*this.pixelData.rowSize;
+            let rowOffset2 = this.pixelData.offset + (this.pixelData.height - i)*this.pixelData.rowSize;
+            clone.copy(this.buffer, rowOffset1, rowOffset2);
+        }
+    }
 
 }
 
