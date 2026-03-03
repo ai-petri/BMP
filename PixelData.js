@@ -73,37 +73,6 @@ class PixelData
         return new Context(this.width,this.height,this.getPixel.bind(this),this.setPixel.bind(this))
     }
 
-    
-
-    
-
-    
-    /**
-     * @param {Array<{x:Number,y:Number}>} points 
-     * @param {Number} R 
-     * @param {Number} G 
-     * @param {Number} B 
-     * @param {Number} lineWidth 
-     */
-    strokePath(points,R=0,G=0,B=0,lineWidth=1)
-    {
-        if(points.length < 2) return;
-
-        for(let i=0; i<points.length - 1; i++)
-        {
-            if(lineWidth > 1 && i > 0)
-            {
-                this.fillCircle(points[i].x, points[i].y, lineWidth/2, R, G, B);
-            }
-            this.strokeLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, R, G, B, lineWidth);
-        }
-    }
-
-
-
- 
-
-    
 
 }
 
