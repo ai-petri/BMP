@@ -3,7 +3,7 @@ const Context = require("./Context");
 class PixelData
 {
     /**
-     * @param {NonSharedBuffer} buffer
+     * @param {ArrayBuffer} buffer
      * @param {{offset:Number,width:Number,height:Number}} options 
      */
     constructor(buffer, options)
